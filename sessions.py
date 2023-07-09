@@ -34,6 +34,7 @@ class Session:
         self.promt = [{"role": "system", "content": f"{self.system_promt}"}]
         self.total_tokens = self._num_tokens_from_messages(
             self.promt, self.model)
+        self.session_start = dt.datetime.now()
         self.last_promt = dt.datetime.now()
 
     def _num_tokens_from_messages(self, messages, model):

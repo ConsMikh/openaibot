@@ -9,7 +9,7 @@ from openai.error import InvalidRequestError
 from sessions import Session
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
-bot_key = os.getenv("cmikh_openai_chat_bot")
+bot_key = os.getenv("CMIKH_OPENAI_CHAT_BOT")
 
 bot = telebot.TeleBot(bot_key)
 
@@ -84,9 +84,3 @@ def message_handler(mess):
 
 
 bot.polling()
-
-
-# models = openai.Model.list()
-
-# # print the first model's id
-# print(models)

@@ -1,2 +1,3 @@
 venv/
 research.ipynb
+*__pycache__*

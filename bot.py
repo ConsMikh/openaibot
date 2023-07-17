@@ -1,25 +1,90 @@
-__version__ = 'v1.2'
+__version__ = 'v1.3.1'
 
 import os
-import openai
+
 import telebot
 
-from openai.error import InvalidRequestError
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from sessions import Session
+from sessions import Session, SessionException
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+
 bot_key = os.getenv("CMIKH_OPENAI_CHAT_BOT")
 
 bot = telebot.TeleBot(bot_key)
 
 
+def gen_markup():
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 2
+    markup.add(InlineKeyboardButton("gpt-3.5-turbo", callback_data="gpt-3.5-turbo"),
+               InlineKeyboardButton("gpt-3.5-turbo-16k",
+                                    callback_data="gpt-3.5-turbo-16k"),
+               #    InlineKeyboardButton("gpt-4", callback_data="gpt-4"),
+               )
+    return markup
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+
+    model = call.data
+    from_user = call.from_user.id
+    bot.answer_callback_query(call.id, show_alert=False)
+    if Session.sessions_list.get(from_user, False):
+        session = Session.sessions_list[from_user]
+        session.model = model
+
+    else:
+        session = Session(from_user, model=model)
+    bot.send_message(chat_id=from_user,
+                     text='Moдель установлена')
+
+
+@bot.message_handler(commands=['model'])
+def model(mess):
+    bot.send_message(mess.chat.id, "Выберите модель из списка",
+                     reply_markup=gen_markup())
+
+
 @bot.message_handler(commands=['info'])
 def info(mess):
-    models = [model.id for model in openai.Model.list().data]
-    models_name = '\n'.join(model for model in models)
-    bot.reply_to(
-        mess, f"Версия {__version__}\n\nДоступные модели:\n{models_name}")
+    from_user = mess.from_user.id
+
+    session_info = Session.sessions_list[from_user].__repr__(
+    ) if Session.sessions_list.get(from_user, False) else 'Сессия не создана'
+
+    bot.send_message(chat_id=from_user,
+                     text=f"Версия {__version__}\n\nДоступные команды:\n/clear - очистить сессию (остается только системный промт)\n/model - выбрать модель для сессии\n/system [текст] - поменять системный промт на [текст] (сессия будет очищена)\n/t или /т - вывести количество токенов в сессии\n\n{session_info}")
+
+
+@bot.message_handler(commands=['sessions'])
+def sessions(mess):
+    from_user = mess.from_user.id
+    text = '\n'.join([ses.__repr__()
+                     for ses in Session.sessions_list.values()])
+    bot.send_message(chat_id=from_user,
+                     text=text if len(text) > 0 else 'Нет активных сессий')
+
+
+@bot.message_handler(commands=['system'])
+def system(mess):
+
+    from_user = mess.from_user.id
+    system_promt = ' '.join(mess.text.split(' ')[1:])
+    if len(system_promt) > 0:
+        if Session.sessions_list.get(from_user, False):
+            session = Session.sessions_list[from_user]
+            session.system_promt = system_promt
+            session.promt = [{"role": "system", "content": f"{system_promt}"}]
+
+        else:
+            session = Session(from_user, system_promt=system_promt)
+        bot.send_message(chat_id=from_user,
+                         text='Системный промт установлен')
+    else:
+        bot.send_message(chat_id=from_user,
+                         text='Системный промт не задан')
 
 
 @bot.message_handler(commands=['tokens', 't', 'токены', 'т'])
@@ -29,8 +94,8 @@ def tokens(mess):
 
     if Session.sessions_list.get(from_user, False):
         session = Session.sessions_list[from_user]
-        bot.reply_to(
-            mess, f"Количество токенов в сессии: {session.total_tokens}\nМаксимум токенов в сессии: 4097")
+        bot.send_message(
+            chat_id=from_user,  text=f"Количество токенов в сессии: {session.total_tokens}")
     else:
         bot.reply_to(mess, f"Сессия не начата")
 
@@ -43,9 +108,9 @@ def clear_session(mess):
     if Session.sessions_list.get(from_user, False):
         session = Session.sessions_list[from_user]
         session.clear_session()
-        bot.reply_to(mess, f"Сессия сброшена")
+        bot.send_message(chat_id=from_user,  text=f"Сессия сброшена")
     else:
-        bot.reply_to(mess, f"Сессия не начата")
+        bot.send_message(chat_id=from_user,  text=f"Сессия не начата")
 
 
 @bot.message_handler(func=lambda mess: True)
@@ -57,30 +122,20 @@ def message_handler(mess):
     if Session.sessions_list.get(from_user, False):
         session = Session.sessions_list[from_user]
         session.add_message_to_promt(role='user', message=message)
-        # print(session)
+
     else:
         session = Session(from_user)
         session.add_message_to_promt(role='user', message=message)
-        # print(session)
 
     try:
-        chat = openai.ChatCompletion.create(
-            model=session.model, messages=session.promt
-        )
-        reply = chat.choices[0].message.content
-        session.add_message_to_promt(role="assistant", message=reply)
+        reply = session.send_promt()
+    except SessionException as e:
+        reply = f"Ошибка OpenAI API: {e}\n\nСессия очищена"
+    except Exception as e:
+        reply = f"Ошибка выполения: {e}"
+    finally:
         bot.send_message(chat_id=from_user,
                          text=reply)
-    except InvalidRequestError as e:
-        bot.send_message(chat_id=from_user,
-                         text=e)
-        session.clear_session()
-        bot.send_message(chat_id=from_user,
-                         text=f"Сессия сброшена")
-
-    except Exception as e:
-        bot.send_message(chat_id=from_user,
-                         text=e)
 
 
-bot.polling()
+bot.infinity_polling()

@@ -2,6 +2,20 @@
 
 import tiktoken
 import datetime as dt
+import openai
+import os
+
+from openai.error import InvalidRequestError
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+
+class SessionException(Exception):
+    pass
+
+
+class OpenAIException(Exception):
+    pass
 
 
 class Session:
@@ -22,7 +36,7 @@ class Session:
         Session.sessions_list[self.user_id] = self
 
     def __repr__(self) -> str:
-        return f"User id: {self.user_id}\nStart: {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}\nLast: {self.last_promt.strftime('%Y-%m-%d %H:%M:%S')}\nTotal tokens: {self.total_tokens}\nModel: {self.model}"
+        return f"User id: {self.user_id}\nStart: {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}\nLast: {self.last_promt.strftime('%Y-%m-%d %H:%M:%S')}\nTotal tokens: {self.total_tokens}\nModel: {self.model}\nSystem promt: {self.system_promt}"
 
     def add_message_to_promt(self, role='user', message='You are a intelligent assistant.'):
         self.promt.append({"role": role, "content": message})
@@ -36,6 +50,21 @@ class Session:
             self.promt, self.model)
         self.session_start = dt.datetime.now()
         self.last_promt = dt.datetime.now()
+
+    def send_promt(self):
+        try:
+            chat = openai.ChatCompletion.create(
+                model=self.model, messages=self.promt
+            )
+            reply = chat.choices[0].message.content
+            self.add_message_to_promt(role="assistant", message=reply)
+        except InvalidRequestError as e:
+            self.clear_session()
+            raise SessionException(e)
+        except Exception as e:
+            raise Exception(e)
+        else:
+            return reply
 
     def _num_tokens_from_messages(self, messages, model):
         try:

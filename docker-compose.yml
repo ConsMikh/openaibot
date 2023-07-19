@@ -1,0 +1,8 @@
+version: '3.7'
+services:
+  bot:
+    build: .
+    command: /app/entrypoint.sh
+    env_file:
+      - docker/.env
+    restart: always

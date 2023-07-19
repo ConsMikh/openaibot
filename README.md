@@ -4,6 +4,8 @@
 
 [A Simple Guide to The (New) ChatGPT API with Python](https://medium.com/geekculture/a-simple-guide-to-chatgpt-api-with-python-c147985ae28)
 
+[Документация OpenAI API](https://platform.openai.com/docs/guides/gpt)
+
 [Покупка виртуальных карт](https://wanttopay.net/)
 
 [Как оплатить ChatGPT](https://dzen.ru/a/ZBmbwIEH5UfGiHbR)
@@ -40,3 +42,4 @@
 |  1.2   | Добавлено:<br>- для каждого пользователя создается сессия<br>- команда /t для запроса количества токенов в текущей сессии<br>- команда /clear для сброса сессии                                                                 | 2023-07-09 |
 |  1.3   | Добавлено:<br>- команда /model выбора модели<br>- команда /system для установки системного промта<br>- команда /sessions для вывода списка сессий<br>Доработано:<br>- команда /info выводит список команд и информацию о сессии | 2023-07-17 |
 | 1.3.1  | Доработано:<br>- улучшено разделение на классы                                                                                                                                                                                  | 2023-07-17 |
+| 1.3.2  | Сделал запуск через docker                                                                                                                                                                                                      | 2023-07-17 |

@@ -1,6 +1,7 @@
 FROM python:3.10
 
 RUN mkdir -p /app
+RUN CHMOD 777 /app
 WORKDIR /app
 
 COPY src/ ./

@@ -1,24 +1,3 @@
-# Sources
-
-[How to format inputs to ChatGPT models](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_format_inputs_to_ChatGPT_models.ipynb)
-
-[A Simple Guide to The (New) ChatGPT API with Python](https://medium.com/geekculture/a-simple-guide-to-chatgpt-api-with-python-c147985ae28)
-
-[Документация OpenAI API](https://platform.openai.com/docs/guides/gpt)
-
-[Покупка виртуальных карт](https://wanttopay.net/)
-
-[Как оплатить ChatGPT](https://dzen.ru/a/ZBmbwIEH5UfGiHbR)
-
-[OpenAI Python Library](https://github.com/openai/openai-python)
-
-[OpenAI Cookbook](https://github.com/openai/openai-cookbook/)
-
-[pyTelegramBotAPI](https://github.com/eternnoir/pyTelegramBotAPI)
-
-[Использование screen для сеансов в linux](https://wiki.merionet.ru/articles/kak-polzovatsya-utilitoj-screen-v-linux)
-
-
 # Backog
 1. + Сброс сессии при достижении максимальной длины промта
 2. Сделать автоматическое отслеживание количества токенов. Сессия должна запрашивать максимальное количество токенов для модели. Когда промт приближается к максимальному количеству выводить сообщение об этом
@@ -42,4 +21,27 @@
 |  1.2   | Добавлено:<br>- для каждого пользователя создается сессия<br>- команда /t для запроса количества токенов в текущей сессии<br>- команда /clear для сброса сессии                                                                 | 2023-07-09 |
 |  1.3   | Добавлено:<br>- команда /model выбора модели<br>- команда /system для установки системного промта<br>- команда /sessions для вывода списка сессий<br>Доработано:<br>- команда /info выводит список команд и информацию о сессии | 2023-07-17 |
 | 1.3.1  | Доработано:<br>- улучшено разделение на классы                                                                                                                                                                                  | 2023-07-17 |
-| 1.3.2  | Сделал запуск через docker                                                                                                                                                                                                      | 2023-07-17 |
+| 1.3.2  | Сделал запуск через docker                                                                                                                                                                                                      | 2023-07-19 |
+
+
+# Sources
+
+[How to format inputs to ChatGPT models](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_format_inputs_to_ChatGPT_models.ipynb)
+
+[A Simple Guide to The (New) ChatGPT API with Python](https://medium.com/geekculture/a-simple-guide-to-chatgpt-api-with-python-c147985ae28)
+
+[Документация OpenAI API](https://platform.openai.com/docs/guides/gpt)
+
+[Покупка виртуальных карт](https://wanttopay.net/)
+
+[Как оплатить ChatGPT](https://dzen.ru/a/ZBmbwIEH5UfGiHbR)
+
+[OpenAI Python Library](https://github.com/openai/openai-python)
+
+[OpenAI Cookbook](https://github.com/openai/openai-cookbook/)
+
+[pyTelegramBotAPI](https://github.com/eternnoir/pyTelegramBotAPI)
+
+[Использование screen для сеансов в linux](https://wiki.merionet.ru/articles/kak-polzovatsya-utilitoj-screen-v-linux)
+
+[Автозапуск скриптов в Debian](https://linuxhint.com/run-script-debian-11-boot-up/)

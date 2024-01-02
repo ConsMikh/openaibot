@@ -1,4 +1,4 @@
-__version__ = 'v1.3.2'
+__version__ = 'v1.3.3'
 
 import os
 
@@ -20,7 +20,8 @@ def gen_markup():
     markup.add(InlineKeyboardButton("gpt-3.5-turbo", callback_data="gpt-3.5-turbo"),
                InlineKeyboardButton("gpt-3.5-turbo-16k",
                                     callback_data="gpt-3.5-turbo-16k"),
-               #    InlineKeyboardButton("gpt-4", callback_data="gpt-4"),
+               InlineKeyboardButton("gpt-4", callback_data="gpt-4"),
+               InlineKeyboardButton("gpt-4-0613", callback_data="gpt-4-0613"),
                )
     return markup
 
@@ -130,9 +131,9 @@ def message_handler(mess):
     try:
         reply = session.send_promt()
     except SessionException as e:
-        reply = f"Ошибка OpenAI API: {e}\n\nСессия очищена"
+        reply = f"Ошибка OpenAI API: {repr(e)}\n\nСессия очищена"
     except Exception as e:
-        reply = f"Ошибка выполения: {e}"
+        reply = f"Ошибка выполения: {repr(e)}"
     finally:
         bot.send_message(chat_id=from_user,
                          text=reply)

@@ -2,7 +2,7 @@ version: '3.7'
 services:
   bot:
     build: .
-    command: /app/entrypoint.sh
+    command: python3 /usr/src/app/bot.py
     env_file:
       - docker/.env
     restart: always

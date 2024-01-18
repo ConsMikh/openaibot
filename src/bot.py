@@ -1,4 +1,4 @@
-__version__ = 'v1.3.3'
+__version__ = 'v1.4.0'
 
 import os
 
@@ -69,6 +69,17 @@ def sessions(mess):
                      text=text if len(text) > 0 else 'Нет активных сессий')
 
 
+@bot.message_handler(commands=['session'])
+def sessions(mess):
+    from_user = mess.from_user.id
+    text = ""
+    if Session.sessions_list.get(from_user, False):
+        text = Session.sessions_list[from_user].__repr__()
+
+    bot.send_message(chat_id=from_user,
+                     text=text if len(text) > 0 else 'Нет активных сессий')
+
+
 @bot.message_handler(commands=['system'])
 def system(mess):
 
@@ -113,6 +124,23 @@ def clear_session(mess):
         bot.send_message(chat_id=from_user,  text=f"Сессия сброшена")
     else:
         bot.send_message(chat_id=from_user,  text=f"Сессия не начата")
+
+
+@bot.message_handler(commands=['mode'])
+def set_sesion_mode(mess):
+    message = ' '.join(mess.text.split(' ')[1:])
+    from_user = mess.from_user.id
+    if message not in ['fin', 'inf']:
+        bot.send_message(
+            chat_id=from_user,  text=f"Может быть одно из изначений:\nfin - контекст сбрасывается после каждого сообщения\ninf - контекст накпливается")
+    else:
+        if Session.sessions_list.get(from_user, False):
+            session = Session.sessions_list[from_user]
+        else:
+            session = Session(from_user, ses_type=message)
+        session.ses_type = message
+        bot.send_message(chat_id=from_user,
+                         text=f"Режим {message} установлен")
 
 
 @bot.message_handler(func=lambda mess: True)

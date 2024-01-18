@@ -25,7 +25,7 @@ class Session:
     def __init__(self, user_id: str, ses_type='fin', model='gpt-3.5-turbo', system_promt="You are a intelligent assistant.") -> None:
         self.user_id = user_id
         self.model = model
-        # inf - бесконечный (чистка контекста),  fin - конечный (до достижения максимального количества токенов)
+        # inf - контекст накапливается,  fin - контекст очищается после каждого сообщения
         self.ses_type = ses_type
         self.system_promt = system_promt
         self.promt = [{"role": "system", "content": f"{self.system_promt}"}]
@@ -36,9 +36,17 @@ class Session:
         Session.sessions_list[self.user_id] = self
 
     def __repr__(self) -> str:
-        return f"User id: {self.user_id}\nStart: {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}\nLast: {self.last_promt.strftime('%Y-%m-%d %H:%M:%S')}\nTotal tokens: {self.total_tokens}\nModel: {self.model}\nSystem promt: {self.system_promt}"
+        return f"User id: {self.user_id}\n"\
+            f"Model: {self.model}\n"\
+            f"Mode: {self.ses_type}\n"\
+            f"Start: {self.session_start.strftime('%Y-%m-%d %H:%M:%S')}\n"\
+            f"Last: {self.last_promt.strftime('%Y-%m-%d %H:%M:%S')}\n"\
+            f"Total tokens: {self.total_tokens}\n"\
+            f"System promt: {self.system_promt}"
 
     def add_message_to_promt(self, role='user', message='You are a intelligent assistant.'):
+        if self.ses_type == 'fin':
+            self.clear_session()
         self.promt.append({"role": role, "content": message})
         self.total_tokens = self._num_tokens_from_messages(
             self.promt, self.model)

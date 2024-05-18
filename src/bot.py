@@ -1,4 +1,4 @@
-__version__ = 'v1.4.1'
+__version__ = 'v1.4.2'
 
 import os
 import json
@@ -38,7 +38,11 @@ def choise_model():
                                     callback_data="{\"command\":\"model\",\"param\":\"gpt-4\"}"),
                InlineKeyboardButton("gpt-4-0613",
                                     callback_data="{\"command\":\"model\",\"param\":\"gpt-4-0613\"}"),
-               )
+               InlineKeyboardButton("gpt-4o",
+                                    callback_data="{\"command\":\"model\",\"param\":\"gpt-4o\"}"),
+               InlineKeyboardButton("gpt-4-turbo",
+                                    callback_data="{\"command\":\"model\",\"param\":\"gpt-4-turbo\"}"),
+               ),
     return markup
 
 
